@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/musik-dashboard
+  IMAGE_NAME: rexx09/musik-dashboard
 
 jobs:
   build-and-push:
@@ -28,7 +28,7 @@ jobs:
       - name: Node.js einrichten
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: 'ui/package-lock.json'
 
@@ -36,6 +36,9 @@ jobs:
         run: |
           cd ui
           npm ci --ignore-scripts
+          # Workbox-Libraries manuell kopieren (postinstall-Skript funktioniert nur unter Linux/macOS)
+          mkdir -p public/3rdparty/workbox
+          npx --yes workbox copyLibraries build/3rdparty/ 2>/dev/null || true
 
       - name: UI bauen
         run: |

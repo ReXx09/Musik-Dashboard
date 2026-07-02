@@ -33,6 +33,25 @@ please file a [GitHub issue](https://github.com/navidrome/navidrome/issues) or j
 
 See instructions on the [project's website](https://www.navidrome.org/docs/installation/)
 
+## Unraid / eigenes Image
+
+Wenn du Navidrome auf Unraid als einzelnes Image betreiben willst und nur die Oberfläche aus diesem Fork nutzen möchtest, nimm das aus dem Repository gebaute Image aus der GitHub Container Registry.
+
+- Image: `ghcr.io/rexx09/musik-dashboard:latest`
+- Port: `4533`
+- Musik-Volume: wie im bisherigen Navidrome-Container beibehalten
+- Daten-Volume: wie im bisherigen Navidrome-Container beibehalten
+
+Das Backend bleibt dabei funktional Navidrome. Die optischen Änderungen kommen aus deinem Fork und werden erst beim Neu-Build des Images übernommen. Wenn du spätere Navidrome-Updates einspielen willst, mergst du die Upstream-Änderungen in den Fork und baust das Image anschließend neu.
+
+Wichtig für Unraid:
+
+1. Den alten Standard-Navidrome-Container durch dieses eigene Image ersetzen.
+2. Die bestehenden Volume-Mappings für Musik und Datenbank unverändert lassen.
+3. Das Image nach jedem UI- oder Upstream-Update neu ziehen oder neu bauen.
+
+Wenn du stattdessen nur die UI als separaten Container betreiben willst, brauchst du zusätzlich einen Proxy vor Navidrome. Diese Variante ist für das hier dokumentierte Ein-Image-Setup nicht erforderlich.
+
 ## Cloud Hosting
 
 [PikaPods](https://www.pikapods.com) has partnered with us to offer you an 

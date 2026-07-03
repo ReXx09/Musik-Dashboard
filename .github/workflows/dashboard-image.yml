@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: rexx09/musik-dashboard
+  IMAGE_NAME: rexx09/musik-dashboard-ui
 
 jobs:
   build-and-push:

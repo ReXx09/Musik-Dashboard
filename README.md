@@ -42,6 +42,8 @@ Wenn du Navidrome auf Unraid als einzelnes Image betreiben willst und nur die Ob
 - Musik-Volume: wie im bisherigen Navidrome-Container beibehalten
 - Daten-Volume: wie im bisherigen Navidrome-Container beibehalten
 
+Hinweis: `ghcr.io/rexx09/musik-dashboard-ui:latest` ist ein reines UI-Image (Nginx) und nicht fuer den Ein-Container-Betrieb gedacht.
+
 Das Backend bleibt dabei funktional Navidrome. Die optischen Änderungen kommen aus deinem Fork und werden erst beim Neu-Build des Images übernommen. Wenn du spätere Navidrome-Updates einspielen willst, mergst du die Upstream-Änderungen in den Fork und baust das Image anschließend neu.
 
 Wichtig für Unraid:

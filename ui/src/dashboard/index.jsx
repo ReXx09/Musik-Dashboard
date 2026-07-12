@@ -303,41 +303,28 @@ const Dashboard = () => {
         let totalSongs = 0
 
         try {
-          const insights = await dataProvider.getList('insights', {
-            pagination: { page: 1, perPage: 100 },
-            sort: { field: 'id', order: 'ASC' },
-            filter: {},
-          })
-          insights?.data?.forEach((item) => {
-            if (item.id === 'totalAlbums') totalAlbums = item.value
-            else if (item.id === 'totalArtists') totalArtists = item.value
-            else if (item.id === 'totalSongs') totalSongs = item.value
-          })
-        } catch (e) {
-          try {
-            const [albums, artists, songs] = await Promise.all([
-              dataProvider.getList('album', {
-                pagination: { page: 1, perPage: 1 },
-                sort: { field: 'name', order: 'ASC' },
-                filter: {},
-              }),
-              dataProvider.getList('artist', {
-                pagination: { page: 1, perPage: 1 },
-                sort: { field: 'name', order: 'ASC' },
-                filter: {},
-              }),
-              dataProvider.getList('song', {
-                pagination: { page: 1, perPage: 1 },
-                sort: { field: 'title', order: 'ASC' },
-                filter: {},
-              }),
-            ])
-            totalAlbums = albums?.total || 0
-            totalArtists = artists?.total || 0
-            totalSongs = songs?.total || 0
-          } catch (e2) {
-            // ignore
-          }
+          const [albums, artists, songs] = await Promise.all([
+            dataProvider.getList('album', {
+              pagination: { page: 1, perPage: 1 },
+              sort: { field: 'name', order: 'ASC' },
+              filter: {},
+            }),
+            dataProvider.getList('artist', {
+              pagination: { page: 1, perPage: 1 },
+              sort: { field: 'name', order: 'ASC' },
+              filter: {},
+            }),
+            dataProvider.getList('song', {
+              pagination: { page: 1, perPage: 1 },
+              sort: { field: 'title', order: 'ASC' },
+              filter: {},
+            }),
+          ])
+          totalAlbums = albums?.total || 0
+          totalArtists = artists?.total || 0
+          totalSongs = songs?.total || 0
+        } catch (e2) {
+          // ignore
         }
 
         setHasData(totalAlbums > 0)

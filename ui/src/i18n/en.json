@@ -86,6 +86,19 @@
         "missing": "Missing"
       },
       "actions": {
+    "folder": {
+      "name": "Folder |||| Folders",
+      "fields": {
+        "name": "Name",
+        "path": "Path",
+        "library_id": "Library ID",
+        "num_audio_files": "Audio Files",
+        "num_playlists": "Playlists",
+        "missing": "Missing",
+        "updated_at": "Updated",
+        "created_at": "Created"
+      }
+    },
         "playAll": "Play",
         "playNext": "Play Next",
         "addToQueue": "Play Later",

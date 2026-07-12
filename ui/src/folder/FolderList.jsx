@@ -4,7 +4,6 @@ import {
   Datagrid,
   DateField,
   NumberField,
-  ReferenceField,
   TextField,
 } from 'react-admin'
 import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined'
@@ -23,9 +22,7 @@ const FolderList = (props) => {
       <Datagrid rowClick={false}>
         <TextField source="name" />
         <TextField source="path" />
-        <ReferenceField source="library_id" reference="library" link={false}>
-          <TextField source="name" />
-        </ReferenceField>
+        <NumberField source="library_id" />
         <NumberField source="num_audio_files" />
         <NumberField source="num_playlists" />
         <BooleanField source="missing" />

@@ -44,11 +44,18 @@ Wenn du Navidrome auf Unraid als einzelnes Image betreiben willst und die Oberfl
 
 Das Backend bleibt dabei funktional Navidrome. Die optischen Änderungen kommen aus deinem Fork und werden erst beim Neu-Build des Images übernommen. Wenn du spätere Navidrome-Updates einspielen willst, mergst du die Upstream-Änderungen in den Fork und baust das Image anschließend neu.
 
+Template fuer Unraid (XML):
+
+- Datei im Repo: `contrib/unraid/musik-dashboard.xml`
+- Raw URL zum Import in Unraid:
+  `https://raw.githubusercontent.com/ReXx09/Musik-Dashboard/master/contrib/unraid/musik-dashboard.xml`
+
 Wichtig für Unraid:
 
 1. Den alten Standard-Navidrome-Container durch dieses eigene Image ersetzen.
 2. Die bestehenden Volume-Mappings für Musik und Datenbank unverändert lassen.
 3. Das Image nach jedem UI- oder Upstream-Update neu ziehen oder neu bauen.
+4. In Unraid im Template-Manager die obige Raw-URL importieren.
 
 ## Cloud Hosting
 

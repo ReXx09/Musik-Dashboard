@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>musik-dashboard</Name>
+  <Repository>ghcr.io/rexx09/musik-dashboard:latest</Repository>
+  <Registry>https://ghcr.io</Registry>
+  <Network>bridge</Network>
+  <Support>https://github.com/ReXx09/Musik-Dashboard/issues</Support>
+  <Project>https://github.com/ReXx09/Musik-Dashboard</Project>
+  <Overview>Navidrome with custom dashboard UI from fork. Single container setup without nginx.</Overview>
+  <Category>MediaServer:Music</Category>
+  <WebUI>http://[IP]:[PORT:4533]/</WebUI>
+  <Icon>https://raw.githubusercontent.com/navidrome/navidrome/master/resources/logo-192x192.png</Icon>
+
+  <Config Name="WebUI" Target="4533" Default="" Mode="tcp" Description="Container Port: 4533" Type="Port" Display="always" Required="true" Mask="false">4533</Config>
+  <Config Name="Appdata" Target="/data" Default="" Mode="rw" Description="Container Path: /data" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/musik-dashboard</Config>
+  <Config Name="Music" Target="/music" Default="" Mode="rw" Description="Container Path: /music" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/music</Config>
+
+  <Config Name="Scan Schedule" Target="ND_SCANSCHEDULE" Default="" Mode="" Description="Container Variable: ND_SCANSCHEDULE" Type="Variable" Display="advanced" Required="false" Mask="false">1m</Config>
+  <Config Name="Log Level" Target="ND_LOGLEVEL" Default="" Mode="" Description="Container Variable: ND_LOGLEVEL" Type="Variable" Display="advanced" Required="false" Mask="false">info</Config>
+  <Config Name="Session Timeout" Target="ND_SESSIONTIMEOUT" Default="" Mode="" Description="Container Variable: ND_SESSIONTIMEOUT" Type="Variable" Display="advanced" Required="false" Mask="false">24h</Config>
+  <Config Name="Base URL" Target="ND_BASEURL" Default="" Mode="" Description="Container Variable: ND_BASEURL" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="Image Cache Size" Target="ND_IMAGECACHESIZE" Default="" Mode="" Description="Container Variable: ND_IMAGECACHESIZE" Type="Variable" Display="advanced" Required="false" Mask="false">200MB</Config>
+</Container>

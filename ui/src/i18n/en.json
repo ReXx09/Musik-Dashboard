@@ -105,19 +105,6 @@
         "topRated": "Top Rated"
       }
     },
-    "folder": {
-      "name": "Folder |||| Folders",
-      "fields": {
-        "name": "Name",
-        "path": "Path",
-        "library_id": "Library ID",
-        "num_audio_files": "Audio Files",
-        "num_playlists": "Playlists",
-        "missing": "Missing",
-        "updated_at": "Updated",
-        "created_at": "Created"
-      }
-    },
     "artist": {
       "name": "Artist |||| Artists",
       "fields": {

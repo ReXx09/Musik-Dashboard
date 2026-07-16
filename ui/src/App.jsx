@@ -17,7 +17,6 @@ import player from './player'
 import user from './user'
 import song from './song'
 import album from './album'
-import folder from './folder'
 import artist from './artist'
 import playlist from './playlist'
 import radio from './radio'
@@ -128,7 +127,6 @@ const Admin = (props) => {
     >
       {(permissions) => [
         <Resource name="album" {...album} options={{ subMenu: 'albumList' }} />,
-        <Resource name="folder" {...folder} />,
         <Resource name="artist" {...artist} />,
         <Resource name="song" {...song} />,
         <Resource

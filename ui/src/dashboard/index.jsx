@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { useDataProvider, useTranslate, Loading } from 'react-admin'
+import { useTranslate } from 'react-admin'
 import { makeStyles } from '@material-ui/core/styles'
 import {
   Card,
@@ -280,7 +280,6 @@ const useStyles = makeStyles((theme) => ({
 const Dashboard = () => {
   const classes = useStyles()
   const translate = useTranslate()
-  const dataProvider = useDataProvider()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const isTablet = useMediaQuery(theme.breakpoints.down('md'))
@@ -288,88 +287,10 @@ const Dashboard = () => {
   const playerState = useSelector((state) => state.player)
   const currentTrack = playerState?.current
 
-  const [stats, setStats] = useState(null)
-  const [recentAlbums, setRecentAlbums] = useState([])
-  const [topRatedAlbums, setTopRatedAlbums] = useState([])
-  const [hasData, setHasData] = useState(true)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      setLoading(true)
-      try {
-        let totalAlbums = 0
-        let totalArtists = 0
-        let totalSongs = 0
-
-        try {
-          const [albums, artists, songs] = await Promise.all([
-            dataProvider.getList('album', {
-              pagination: { page: 1, perPage: 1 },
-              sort: { field: 'name', order: 'ASC' },
-              filter: {},
-            }),
-            dataProvider.getList('artist', {
-              pagination: { page: 1, perPage: 1 },
-              sort: { field: 'name', order: 'ASC' },
-              filter: {},
-            }),
-            dataProvider.getList('song', {
-              pagination: { page: 1, perPage: 1 },
-              sort: { field: 'title', order: 'ASC' },
-              filter: {},
-            }),
-          ])
-          totalAlbums = albums?.total || 0
-          totalArtists = artists?.total || 0
-          totalSongs = songs?.total || 0
-        } catch (e2) {
-          // ignore
-        }
-
-        setHasData(totalAlbums > 0)
-        setStats({
-          albums: totalAlbums,
-          artists: totalArtists,
-          songs: totalSongs,
-        })
-
-        if (totalAlbums > 0) {
-          try {
-            const recent = await dataProvider.getList('album', {
-              pagination: { page: 1, perPage: 8 },
-              sort: { field: 'created_at', order: 'DESC' },
-              filter: {},
-            })
-            setRecentAlbums(recent?.data || [])
-          } catch (e) {
-            // ignore
-          }
-
-          if (config.enableStarRating) {
-            try {
-              const top = await dataProvider.getList('album', {
-                pagination: { page: 1, perPage: 4 },
-                sort: { field: 'rating', order: 'DESC' },
-                filter: { has_rating: true },
-              })
-              setTopRatedAlbums(top?.data || [])
-            } catch (e) {
-              // ignore
-            }
-          }
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchDashboardData()
-  }, [dataProvider])
-
-  if (loading) {
-    return <Loading />
-  }
+  const stats = null
+  const recentAlbums = []
+  const topRatedAlbums = []
+  const hasData = true
 
   const statColumns = isMobile ? 6 : isTablet ? 6 : 3
   const albumColumns = isMobile ? 6 : isTablet ? 4 : 3

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useState, useEffect, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useDataProvider, useTranslate, Loading } from 'react-admin'
 import { makeStyles } from '@material-ui/core/styles'
@@ -24,6 +24,8 @@ import {
 import subsonic from '../subsonic'
 import config from '../config'
 import { useImageUrl } from '../common'
+import { playTracks } from '../actions'
+import { processSongsForPlayback } from '../common/playbackActions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -551,14 +553,28 @@ const Dashboard = () => {
 
 const AlbumCard = ({ album }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const dataProvider = useDataProvider()
   const coverUrl = subsonic.getCoverArtUrl(album, config.uiCoverArtSize, true)
   const { imgUrl } = useImageUrl(coverUrl)
 
-  const handlePlay = (e) => {
+  const handlePlay = useCallback(async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    subsonic.play(album.id, 'album')
-  }
+    try {
+      const { data } = await dataProvider.getList('song', {
+        pagination: { page: 1, perPage: 500 },
+        sort: { field: 'trackNumber', order: 'ASC' },
+        filter: { album_id: album.id },
+      })
+      if (data && data.length > 0) {
+        const { songData, ids } = processSongsForPlayback(data)
+        dispatch(playTracks(songData, ids))
+      }
+    } catch (err) {
+      console.error('Fehler beim Abspielen des Albums', err)
+    }
+  }, [album, dispatch, dataProvider])
 
   return (
     <Card className={classes.albumCard} elevation={0}>

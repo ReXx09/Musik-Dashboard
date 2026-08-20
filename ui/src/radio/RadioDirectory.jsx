@@ -26,7 +26,11 @@ const API_URL = 'https://de1.api.radio-browser.info/json/stations/search'
 const FAVORITES_KEY = 'navidrome-radio-favorites'
 
 const useStyles = makeStyles((theme) => ({
-  root: { marginBottom: theme.spacing(3) },
+  root: {
+    width: '100%',
+    marginBottom: theme.spacing(3),
+    overflowX: 'hidden',
+  },
   header: {
     display: 'flex',
     alignItems: 'center',
@@ -52,10 +56,13 @@ const useStyles = makeStyles((theme) => ({
   searchInput: { flex: 1, padding: theme.spacing(0.75) },
   card: {
     height: '100%',
-    width: '80%',
-    margin: '0 auto',
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
+  },
+  grid: {
+    width: '100%',
+    margin: 0,
   },
   avatar: { width: 56, height: 56, margin: theme.spacing(1.5) },
   cardContent: { flex: 1, minWidth: 0, paddingLeft: 0 },
@@ -171,9 +178,9 @@ const RadioDirectory = () => {
       {!loading && !error && visibleStations.length === 0 && (
         <Typography color="textSecondary">Keine Sender gefunden.</Typography>
       )}
-      <Grid container spacing={2}>
+      <Grid container className={classes.grid} spacing={1}>
         {visibleStations.map((station) => (
-          <Grid item xs={12} sm={6} md={4} key={station.stationuuid}>
+          <Grid item xs={12} sm={6} md={3} key={station.stationuuid}>
             <Card className={classes.card} elevation={1}>
               <Avatar className={classes.avatar} src={station.favicon || RADIO_PLACEHOLDER_IMAGE} variant="rounded" />
               <CardContent className={classes.cardContent}>

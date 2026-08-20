@@ -17,9 +17,12 @@ import StarBorderIcon from '@material-ui/icons/StarBorder'
 import StarIcon from '@material-ui/icons/Star'
 import SearchIcon from '@material-ui/icons/Search'
 import { useDispatch } from 'react-redux'
+import { useNotify } from 'react-admin'
 import { setTrack } from '../actions'
 import { songFromRadio } from './helper'
 import { RADIO_PLACEHOLDER_IMAGE } from '../consts'
+import { REST_URL } from '../consts'
+import { httpClient } from '../dataProvider'
 
 const API_URL = 'https://de1.api.radio-browser.info/json/stations/search'
 const FAVORITES_KEY = 'navidrome-radio-favorites'
@@ -81,6 +84,7 @@ const useStyles = makeStyles((theme) => ({
 const RadioDirectory = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const notify = useNotify()
   const [query, setQuery] = useState('')
   const [country, setCountry] = useState('DE')
   const [stations, setStations] = useState([])
@@ -94,6 +98,27 @@ const RadioDirectory = () => {
   const [showFavorites, setShowFavorites] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+
+  const saveServerRadio = async (station) => {
+    const response = await httpClient(`${REST_URL}/radio`, {
+      method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        name: station.name,
+        streamUrl: station.url_resolved || station.url,
+        homePageUrl: station.homepage || '',
+      }),
+    })
+    return response.json
+  }
+
+  const removeServerRadio = async (station) => {
+    const response = await httpClient(`${REST_URL}/radio`, { method: 'GET' })
+    const serverRadios = response.json?.data || response.json || []
+    const streamUrl = station.url_resolved || station.url
+    const match = serverRadios.find((radio) => radio.streamUrl === streamUrl)
+    if (match) await httpClient(`${REST_URL}/radio/${match.id}`, { method: 'DELETE' })
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -133,15 +158,24 @@ const RadioDirectory = () => {
     dispatch(setTrack(await songFromRadio(radio)))
   }
 
-  const toggleFavorite = (station) => {
+  const toggleFavorite = async (station) => {
     const isFavorite = favorites.some(
       (favorite) => favorite.stationuuid === station.stationuuid,
     )
-    const nextFavorites = isFavorite
-      ? favorites.filter((favorite) => favorite.stationuuid !== station.stationuuid)
-      : [...favorites, station]
-    setFavorites(nextFavorites)
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(nextFavorites))
+    try {
+      if (isFavorite) {
+        await removeServerRadio(station)
+      } else {
+        await saveServerRadio(station)
+      }
+      const nextFavorites = isFavorite
+        ? favorites.filter((favorite) => favorite.stationuuid !== station.stationuuid)
+        : [...favorites, station]
+      setFavorites(nextFavorites)
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(nextFavorites))
+    } catch {
+      notify('Radio konnte nicht synchronisiert werden. Bitte Admin-Rechte prüfen.', 'warning')
+    }
   }
 
   const visibleStations = showFavorites ? favorites : stations

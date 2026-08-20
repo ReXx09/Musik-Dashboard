@@ -52,7 +52,7 @@ const PlaylistActions = ({ className, ids, data, record, ...rest }) => {
 
       dataProvider
         .getList('playlistTrack', {
-          pagination: { page: 1, perPage: 0 },
+          pagination: { page: 1, perPage: -1 },
           sort: { field: 'id', order: 'ASC' },
           filter: { playlist_id: record.id },
         })
@@ -61,7 +61,8 @@ const PlaylistActions = ({ className, ids, data, record, ...rest }) => {
             (acc, curr) => ({ ...acc, [curr.id]: curr }),
             {},
           )
-          dispatch(action(data))
+          const ids = res.data.map((song) => song.id)
+          dispatch(action(data, ids))
         })
         .catch(() => {
           notify('ra.page.error', 'warning')

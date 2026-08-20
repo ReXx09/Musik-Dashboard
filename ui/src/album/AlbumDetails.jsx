@@ -34,6 +34,7 @@ import {
 } from '../common'
 import { formatFullDate, intersperse } from '../utils'
 import AlbumExternalLinks from './AlbumExternalLinks'
+import CoverSearchButton from './CoverSearchButton'
 import { SafeHTML } from '../common/SafeHTML'
 
 const useStyles = makeStyles(
@@ -276,6 +277,7 @@ const AlbumDetails = (props) => {
               cursor: imageError ? 'default' : 'pointer',
             }}
           />
+          <CoverSearchButton record={record} />
         </div>
         <div className={classes.details}>
           <CardContent className={classes.content}>

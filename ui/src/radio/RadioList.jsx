@@ -26,6 +26,7 @@ import { setTrack } from '../actions'
 import { songFromRadio } from './helper'
 import { RADIO_PLACEHOLDER_IMAGE } from '../consts'
 import { useDispatch } from 'react-redux'
+import RadioDirectory from './RadioDirectory'
 
 const useStyles = makeStyles({
   row: {
@@ -137,6 +138,7 @@ const RadioList = ({ permissions, ...props }) => {
       filters={<RadioFilter />}
       perPage={isXsmall ? 25 : 10}
     >
+      <RadioDirectory />
       {isXsmall ? (
         <SimpleList
           leftAvatar={(r) => <CoverArtField record={r} />}

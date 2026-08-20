@@ -7,10 +7,10 @@ export async function songFromRadio(radio) {
     return undefined
   }
 
-  let cover = RADIO_PLACEHOLDER_IMAGE
+  let cover = radio.favicon || RADIO_PLACEHOLDER_IMAGE
   if (radio.uploadedImage) {
     cover = subsonic.getCoverArtUrl(radio, config.uiCoverArtSize, true)
-  } else {
+  } else if (!radio.favicon) {
     // Try favicon as fallback
     try {
       const url = new URL(radio.homePageUrl ?? radio.streamUrl)

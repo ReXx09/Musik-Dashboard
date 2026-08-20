@@ -172,6 +172,7 @@ const RadioList = ({ permissions, ...props }) => {
       actions={<RadioListActions isAdmin={isAdmin} />}
       filters={<RadioFilter />}
       perPage={isXsmall ? 25 : 10}
+      empty={false}
     >
       <RadioListContent
         classes={classes}

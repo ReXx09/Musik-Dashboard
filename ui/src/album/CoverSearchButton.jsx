@@ -13,7 +13,6 @@ import {
 } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import { useNotify, useRefresh } from 'react-admin'
-import config from '../config'
 import { REST_URL } from '../consts'
 import { httpClient } from '../dataProvider'
 
@@ -38,21 +37,39 @@ const CoverSearchButton = ({ record }) => {
   const [saving, setSaving] = useState(false)
   const [images, setImages] = useState([])
 
-  const search = useCallback(async () => {
-    if (!record.mbzAlbumId) {
-      notify('Für dieses Album ist keine MusicBrainz-ID vorhanden.', 'warning')
-      return
-    }
+  const findReleaseIds = useCallback(async () => {
+    if (record.mbzAlbumId) return [record.mbzAlbumId]
 
+    const params = new URLSearchParams({
+      query: `release:${record.name} AND artist:${record.albumArtist || record.artist || ''}`,
+      fmt: 'json',
+      limit: '5',
+    })
+    const response = await fetch(
+      `https://musicbrainz.org/ws/2/release/?${params}`,
+      { headers: { Accept: 'application/json' } },
+    )
+    if (!response.ok) throw new Error('Album nicht gefunden')
+    const data = await response.json()
+    return (data.releases || []).map((release) => release.id)
+  }, [record.albumArtist, record.artist, record.mbzAlbumId, record.name])
+
+  const search = useCallback(async () => {
     setOpen(true)
     setLoading(true)
     try {
-      const response = await fetch(
-        `https://coverartarchive.org/release/${record.mbzAlbumId}`,
+      const releaseIds = await findReleaseIds()
+      const results = await Promise.all(
+        releaseIds.map(async (releaseId) => {
+          const response = await fetch(
+            `https://coverartarchive.org/release/${releaseId}`,
+          )
+          if (!response.ok) return []
+          const data = await response.json()
+          return (data.images || []).filter((image) => image.image)
+        }),
       )
-      if (!response.ok) throw new Error('Cover nicht gefunden')
-      const data = await response.json()
-      const foundImages = (data.images || []).filter((image) => image.image)
+      const foundImages = results.flat()
       setImages(foundImages)
       if (!foundImages.length) notify('Keine Cover gefunden.', 'warning')
     } catch (error) {
@@ -61,7 +78,7 @@ const CoverSearchButton = ({ record }) => {
     } finally {
       setLoading(false)
     }
-  }, [notify, record.mbzAlbumId])
+  }, [findReleaseIds, notify])
 
   const saveCover = useCallback(
     async (image) => {
@@ -88,10 +105,6 @@ const CoverSearchButton = ({ record }) => {
     },
     [notify, record.id, refresh],
   )
-
-  if (!config.enableArtworkUpload && localStorage.getItem('role') !== 'admin') {
-    return null
-  }
 
   return (
     <>

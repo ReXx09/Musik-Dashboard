@@ -52,6 +52,11 @@ const useStyles = makeStyles(
     cardContents: {
       display: 'flex',
     },
+    coverColumn: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+    },
     details: {
       display: 'flex',
       flexDirection: 'column',
@@ -261,22 +266,24 @@ const AlbumDetails = (props) => {
   return (
     <Card className={classes.root}>
       <div className={classes.cardContents}>
-        <div className={classes.coverParent}>
-          <CardMedia
-            key={record.id}
-            component={'img'}
-            src={imageUrl}
-            width="400"
-            height="400"
-            className={`${classes.cover} ${imageLoading ? classes.coverLoading : ''}`}
-            onClick={handleOpenLightbox}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            title={record.name}
-            style={{
-              cursor: imageError ? 'default' : 'pointer',
-            }}
-          />
+        <div className={classes.coverColumn}>
+          <div className={classes.coverParent}>
+            <CardMedia
+              key={record.id}
+              component={'img'}
+              src={imageUrl}
+              width="400"
+              height="400"
+              className={`${classes.cover} ${imageLoading ? classes.coverLoading : ''}`}
+              onClick={handleOpenLightbox}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              title={record.name}
+              style={{
+                cursor: imageError ? 'default' : 'pointer',
+              }}
+            />
+          </div>
           <CoverSearchButton record={record} />
         </div>
         <div className={classes.details}>

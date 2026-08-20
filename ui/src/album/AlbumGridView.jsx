@@ -3,7 +3,6 @@ import {
   GridList,
   GridListTile,
   Typography,
-  IconButton,
   useMediaQuery,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -13,10 +12,10 @@ import { linkToRecord, useListContext, Loading } from 'react-admin'
 import { withContentRect } from 'react-measure'
 import { useDrag } from 'react-dnd'
 import subsonic from '../subsonic'
-import { FaPlay } from 'react-icons/fa'
 import {
   ArtistLinkField,
   OverflowTooltip,
+  PlayButton,
   useImageUrl,
 } from '../common'
 import config from '../config'
@@ -189,12 +188,6 @@ const AlbumGridTile = ({ showArtist, record, basePath, ...props }) => {
     record.missing && classes.missingAlbum,
   )
 
-  const handlePlay = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    subsonic.play(record.id, 'album')
-  }
-
   return (
     <div className={computedClasses}>
       <Link
@@ -203,13 +196,11 @@ const AlbumGridTile = ({ showArtist, record, basePath, ...props }) => {
       >
         <Cover record={record} />
         {isDesktop && (
-          <IconButton
+          <PlayButton
+            record={record}
             className={classes.floatingPlayButton}
-            onClick={handlePlay}
             size="small"
-          >
-            <FaPlay className={classes.playIcon} />
-          </IconButton>
+          />
         )}
       </Link>
       <Link

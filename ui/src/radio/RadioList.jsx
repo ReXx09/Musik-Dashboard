@@ -95,6 +95,41 @@ const CoverArtField = ({ record }) => {
 }
 CoverArtField.defaultProps = { label: '' }
 
+const RadioListContent = ({
+  classes,
+  columns,
+  isAdmin,
+  isXsmall,
+  handleRowClick,
+}) => (
+  <>
+    <RadioDirectory />
+    {isXsmall ? (
+      <SimpleList
+        leftAvatar={(r) => <CoverArtField record={r} />}
+        leftIcon={(r) => (
+          <StreamField
+            record={r}
+            source={'streamUrl'}
+            hideUrl
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+          />
+        )}
+        primaryText={(r) => r.name}
+        secondaryText={(r) => r.homePageUrl}
+      />
+    ) : (
+      <Datagrid rowClick={handleRowClick} classes={{ row: classes.row }}>
+        {columns}
+        {isAdmin && <EditButton />}
+      </Datagrid>
+    )}
+  </>
+)
+
 const RadioList = ({ permissions, ...props }) => {
   const classes = useStyles()
   const isXsmall = useMediaQuery((theme) => theme.breakpoints.down('xs'))
@@ -128,43 +163,24 @@ const RadioList = ({ permissions, ...props }) => {
   }
 
   return (
-    <>
-      <RadioDirectory />
-      <List
-        {...props}
-        exporter={false}
-        sort={{ field: 'name', order: 'ASC' }}
-        bulkActionButtons={isAdmin ? undefined : false}
-        hasCreate={isAdmin}
-        actions={<RadioListActions isAdmin={isAdmin} />}
-        filters={<RadioFilter />}
-        perPage={isXsmall ? 25 : 10}
-      >
-        {isXsmall ? (
-          <SimpleList
-            leftAvatar={(r) => <CoverArtField record={r} />}
-            leftIcon={(r) => (
-              <StreamField
-                record={r}
-                source={'streamUrl'}
-                hideUrl
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              />
-            )}
-            primaryText={(r) => r.name}
-            secondaryText={(r) => r.homePageUrl}
-          />
-        ) : (
-          <Datagrid rowClick={handleRowClick} classes={{ row: classes.row }}>
-            {columns}
-            {isAdmin && <EditButton />}
-          </Datagrid>
-        )}
-      </List>
-    </>
+    <List
+      {...props}
+      exporter={false}
+      sort={{ field: 'name', order: 'ASC' }}
+      bulkActionButtons={isAdmin ? undefined : false}
+      hasCreate={isAdmin}
+      actions={<RadioListActions isAdmin={isAdmin} />}
+      filters={<RadioFilter />}
+      perPage={isXsmall ? 25 : 10}
+    >
+      <RadioListContent
+        classes={classes}
+        columns={columns}
+        isAdmin={isAdmin}
+        isXsmall={isXsmall}
+        handleRowClick={handleRowClick}
+      />
+    </List>
   )
 }
 

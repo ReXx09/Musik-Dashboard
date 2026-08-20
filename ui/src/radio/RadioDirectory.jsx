@@ -61,10 +61,10 @@ const useStyles = makeStyles((theme) => ({
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gap: theme.spacing(1),
     width: '100%',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xs')]: {
       gridTemplateColumns: '1fr',
     },
     [theme.breakpoints.between('sm', 'md')]: {

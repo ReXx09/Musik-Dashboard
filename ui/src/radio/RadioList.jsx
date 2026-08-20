@@ -12,6 +12,7 @@ import {
   TextField,
   TopToolbar,
   UrlField,
+  useListContext,
   useTranslate,
 } from 'react-admin'
 import {
@@ -104,31 +105,45 @@ const RadioListContent = ({
 }) => (
   <>
     <RadioDirectory />
-    {isXsmall ? (
-      <SimpleList
-        leftAvatar={(r) => <CoverArtField record={r} />}
-        leftIcon={(r) => (
-          <StreamField
-            record={r}
-            source={'streamUrl'}
-            hideUrl
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-          />
-        )}
-        primaryText={(r) => r.name}
-        secondaryText={(r) => r.homePageUrl}
-      />
-    ) : (
-      <Datagrid rowClick={handleRowClick} classes={{ row: classes.row }}>
-        {columns}
-        {isAdmin && <EditButton />}
-      </Datagrid>
-    )}
+    <RadioDatabaseList
+      classes={classes}
+      columns={columns}
+      isAdmin={isAdmin}
+      isXsmall={isXsmall}
+      handleRowClick={handleRowClick}
+    />
   </>
 )
+
+const RadioDatabaseList = ({ classes, columns, isAdmin, isXsmall, handleRowClick }) => {
+  const { total } = useListContext()
+
+  if (!total) return null
+
+  return isXsmall ? (
+    <SimpleList
+      leftAvatar={(r) => <CoverArtField record={r} />}
+      leftIcon={(r) => (
+        <StreamField
+          record={r}
+          source={'streamUrl'}
+          hideUrl
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+        />
+      )}
+      primaryText={(r) => r.name}
+      secondaryText={(r) => r.homePageUrl}
+    />
+  ) : (
+    <Datagrid rowClick={handleRowClick} classes={{ row: classes.row }}>
+      {columns}
+      {isAdmin && <EditButton />}
+    </Datagrid>
+  )
+}
 
 const RadioList = ({ permissions, ...props }) => {
   const classes = useStyles()

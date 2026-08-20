@@ -16,7 +16,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import StarBorderIcon from '@material-ui/icons/StarBorder'
 import StarIcon from '@material-ui/icons/Star'
 import SearchIcon from '@material-ui/icons/Search'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { setTrack } from '../actions'
 import { songFromRadio } from './helper'
 import { RADIO_PLACEHOLDER_IMAGE } from '../consts'
@@ -43,26 +43,6 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     flexWrap: 'wrap',
   },
-  livePanel: {
-    display: 'flex',
-    alignItems: 'center',
-    minHeight: 68,
-    marginBottom: theme.spacing(2),
-    padding: theme.spacing(1),
-    borderLeft: `3px solid ${theme.palette.error.main}`,
-    backgroundColor: theme.palette.action.hover,
-  },
-  liveStatus: {
-    color: theme.palette.error.main,
-    fontSize: theme.typography.caption.fontSize,
-    fontWeight: 700,
-    letterSpacing: '0.08em',
-    marginRight: theme.spacing(1.5),
-  },
-  liveContent: { minWidth: 0 },
-  liveTitle: { fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  liveMeta: { color: theme.palette.text.secondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  livePlaceholder: { color: theme.palette.text.secondary },
   search: {
     display: 'flex',
     alignItems: 'center',
@@ -101,7 +81,6 @@ const useStyles = makeStyles((theme) => ({
 const RadioDirectory = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const current = useSelector((state) => state.player.current)
   const [query, setQuery] = useState('')
   const [country, setCountry] = useState('DE')
   const [stations, setStations] = useState([])
@@ -199,34 +178,20 @@ const RadioDirectory = () => {
           Favoriten ({favorites.length})
         </Button>
       </div>
-      <div className={classes.livePanel} aria-live="polite" aria-label="Aktueller Radiosender">
-        {current?.isRadio ? (
-          <>
-            <Avatar
-              src={current.cover || current.song?.cover || RADIO_PLACEHOLDER_IMAGE}
-              variant="rounded"
-              className={classes.avatar}
-            />
-            <Typography className={classes.liveStatus}>LIVE</Typography>
-            <div className={classes.liveContent}>
-              <Typography className={classes.liveTitle}>
-                {current.song?.title || current.name || 'Radiosender'}
-              </Typography>
-              <Typography className={classes.liveMeta} variant="body2">
-                {current.song?.artist || current.song?.album || 'Wird gerade abgespielt'}
-              </Typography>
-            </div>
-          </>
-        ) : (
-          <Typography className={classes.livePlaceholder}>Kein Radiosender aktiv</Typography>
-        )}
-      </div>
+      {showFavorites && (
+        <div className={classes.header}>
+          <Typography variant="h6">Meine Radio-Favoriten</Typography>
+          <Typography color="textSecondary">Gespeicherte Sender</Typography>
+        </div>
+      )}
       {loading && <CircularProgress size={24} />}
       {!loading && error && (
         <Typography color="textSecondary">Die Senderliste ist momentan nicht erreichbar.</Typography>
       )}
       {!loading && !error && visibleStations.length === 0 && (
-        <Typography color="textSecondary">Keine Sender gefunden.</Typography>
+        <Typography color="textSecondary">
+          {showFavorites ? 'Noch keine Radio-Favoriten gespeichert.' : 'Keine Sender gefunden.'}
+        </Typography>
       )}
       <div className={classes.grid}>
         {visibleStations.map((station) => (

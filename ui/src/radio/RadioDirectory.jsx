@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CircularProgress,
-  Grid,
   IconButton,
   InputBase,
   makeStyles,
@@ -61,8 +60,16 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
   },
   grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gap: theme.spacing(1),
     width: '100%',
-    margin: 0,
+    [theme.breakpoints.down('sm')]: {
+      gridTemplateColumns: '1fr',
+    },
+    [theme.breakpoints.between('sm', 'md')]: {
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    },
   },
   avatar: { width: 56, height: 56, margin: theme.spacing(1.5) },
   cardContent: { flex: 1, minWidth: 0, paddingLeft: 0 },
@@ -178,9 +185,9 @@ const RadioDirectory = () => {
       {!loading && !error && visibleStations.length === 0 && (
         <Typography color="textSecondary">Keine Sender gefunden.</Typography>
       )}
-      <Grid container className={classes.grid} spacing={1}>
+      <div className={classes.grid}>
         {visibleStations.map((station) => (
-          <Grid item xs={12} sm={6} md={3} key={station.stationuuid}>
+          <div key={station.stationuuid}>
             <Card className={classes.card} elevation={1}>
               <Avatar className={classes.avatar} src={station.favicon || RADIO_PLACEHOLDER_IMAGE} variant="rounded" />
               <CardContent className={classes.cardContent}>
@@ -208,9 +215,9 @@ const RadioDirectory = () => {
                 <PlayArrowIcon />
               </IconButton>
             </Card>
-          </Grid>
+          </div>
         ))}
-      </Grid>
+      </div>
     </section>
   )
 }

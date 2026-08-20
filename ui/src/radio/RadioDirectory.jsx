@@ -14,6 +14,8 @@ import {
   Typography,
 } from '@material-ui/core'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
+import StarBorderIcon from '@material-ui/icons/StarBorder'
+import StarIcon from '@material-ui/icons/Star'
 import SearchIcon from '@material-ui/icons/Search'
 import { useDispatch } from 'react-redux'
 import { setTrack } from '../actions'
@@ -21,6 +23,7 @@ import { songFromRadio } from './helper'
 import { RADIO_PLACEHOLDER_IMAGE } from '../consts'
 
 const API_URL = 'https://de1.api.radio-browser.info/json/stations/search'
+const FAVORITES_KEY = 'navidrome-radio-favorites'
 
 const useStyles = makeStyles((theme) => ({
   root: { marginBottom: theme.spacing(3) },
@@ -52,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
   cardContent: { flex: 1, minWidth: 0, paddingLeft: 0 },
   stationName: { fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   stationMeta: { color: theme.palette.text.secondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  favoriteButton: { color: theme.palette.warning.main },
 }))
 
 const RadioDirectory = () => {
@@ -60,6 +64,14 @@ const RadioDirectory = () => {
   const [query, setQuery] = useState('')
   const [country, setCountry] = useState('DE')
   const [stations, setStations] = useState([])
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')
+    } catch {
+      return []
+    }
+  })
+  const [showFavorites, setShowFavorites] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
@@ -101,6 +113,19 @@ const RadioDirectory = () => {
     dispatch(setTrack(await songFromRadio(radio)))
   }
 
+  const toggleFavorite = (station) => {
+    const isFavorite = favorites.some(
+      (favorite) => favorite.stationuuid === station.stationuuid,
+    )
+    const nextFavorites = isFavorite
+      ? favorites.filter((favorite) => favorite.stationuuid !== station.stationuuid)
+      : [...favorites, station]
+    setFavorites(nextFavorites)
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(nextFavorites))
+  }
+
+  const visibleStations = showFavorites ? favorites : stations
+
   return (
     <section className={classes.root} aria-label="Radiosender entdecken">
       <div className={classes.header}>
@@ -124,16 +149,24 @@ const RadioDirectory = () => {
           <MenuItem value="CH">Schweiz</MenuItem>
           <MenuItem value="US">USA</MenuItem>
         </Select>
+        <Button
+          variant={showFavorites ? 'contained' : 'outlined'}
+          color="default"
+          startIcon={<StarIcon />}
+          onClick={() => setShowFavorites((value) => !value)}
+        >
+          Favoriten ({favorites.length})
+        </Button>
       </div>
       {loading && <CircularProgress size={24} />}
       {!loading && error && (
         <Typography color="textSecondary">Die Senderliste ist momentan nicht erreichbar.</Typography>
       )}
-      {!loading && !error && stations.length === 0 && (
+      {!loading && !error && visibleStations.length === 0 && (
         <Typography color="textSecondary">Keine Sender gefunden.</Typography>
       )}
       <Grid container spacing={2}>
-        {stations.map((station) => (
+        {visibleStations.map((station) => (
           <Grid item xs={12} sm={6} md={4} key={station.stationuuid}>
             <Card className={classes.card} elevation={1}>
               <Avatar className={classes.avatar} src={station.favicon || RADIO_PLACEHOLDER_IMAGE} variant="rounded" />
@@ -143,6 +176,21 @@ const RadioDirectory = () => {
                   {station.tags || station.country || 'Internet-Radio'}
                 </Typography>
               </CardContent>
+              <IconButton
+                className={classes.favoriteButton}
+                aria-label={
+                  favorites.some((favorite) => favorite.stationuuid === station.stationuuid)
+                    ? `Favorit entfernen: ${station.name}`
+                    : `Als Favorit speichern: ${station.name}`
+                }
+                onClick={() => toggleFavorite(station)}
+              >
+                {favorites.some((favorite) => favorite.stationuuid === station.stationuuid) ? (
+                  <StarIcon />
+                ) : (
+                  <StarBorderIcon />
+                )}
+              </IconButton>
               <IconButton aria-label={`Abspielen: ${station.name}`} onClick={() => playStation(station)}>
                 <PlayArrowIcon />
               </IconButton>

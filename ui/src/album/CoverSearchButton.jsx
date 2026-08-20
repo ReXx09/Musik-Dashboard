@@ -55,6 +55,7 @@ const CoverSearchButton = ({ record }) => {
   }, [record.albumArtist, record.artist, record.mbzAlbumId, record.name])
 
   const search = useCallback(async () => {
+    if (loading || saving) return
     setOpen(true)
     setLoading(true)
     try {
@@ -78,7 +79,7 @@ const CoverSearchButton = ({ record }) => {
     } finally {
       setLoading(false)
     }
-  }, [findReleaseIds, notify])
+  }, [findReleaseIds, loading, notify, saving])
 
   const saveCover = useCallback(
     async (image) => {
@@ -112,6 +113,7 @@ const CoverSearchButton = ({ record }) => {
         className={classes.button}
         startIcon={<SearchIcon />}
         onClick={search}
+        disabled={loading || saving}
         size="small"
         variant="outlined"
       >
@@ -120,7 +122,11 @@ const CoverSearchButton = ({ record }) => {
       <Dialog open={open} onClose={() => !saving && setOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Cover auswählen</DialogTitle>
         <DialogContent>
-          {loading && <CircularProgress />}
+          {loading && (
+            <Typography color="textSecondary">
+              <CircularProgress size={18} /> Cover werden gesucht ...
+            </Typography>
+          )}
           {!loading && !images.length && (
             <Typography color="textSecondary">Keine Cover gefunden.</Typography>
           )}

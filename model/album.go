@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/navidrome/navidrome/conf"
+	"github.com/navidrome/navidrome/consts"
 
 	"github.com/gohugoio/hashstructure"
 )
@@ -47,6 +48,7 @@ type Album struct {
 	MbzAlbumType         string   `structs:"mbz_album_type" json:"mbzAlbumType,omitempty"`
 	MbzAlbumComment      string   `structs:"mbz_album_comment" json:"mbzAlbumComment,omitempty"`
 	MbzReleaseGroupID    string   `structs:"mbz_release_group_id" json:"mbzReleaseGroupId,omitempty"`
+	UploadedImage        string   `structs:"uploaded_image" json:"uploadedImage,omitempty"`
 	FolderIDs            []string `structs:"folder_ids" json:"-" hash:"set"` // All folders that contain media_files for this album
 	ExplicitStatus       string   `structs:"explicit_status" json:"explicitStatus"`
 
@@ -67,6 +69,10 @@ type Album struct {
 	ImportedAt time.Time `structs:"imported_at" json:"importedAt" hash:"ignore"` // When this album was imported/updated
 	CreatedAt  time.Time `structs:"created_at" json:"createdAt"`                 // Oldest CreatedAt for all songs in this album
 	UpdatedAt  time.Time `structs:"updated_at" json:"updatedAt"`                 // Newest UpdatedAt for all songs in this album
+}
+
+func (a Album) UploadedImagePath() string {
+	return UploadedImagePath(consts.EntityAlbum, a.UploadedImage)
 }
 
 func (a Album) CoverArtID() ArtworkID {

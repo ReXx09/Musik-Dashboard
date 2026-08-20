@@ -128,41 +128,43 @@ const RadioList = ({ permissions, ...props }) => {
   }
 
   return (
-    <List
-      {...props}
-      exporter={false}
-      sort={{ field: 'name', order: 'ASC' }}
-      bulkActionButtons={isAdmin ? undefined : false}
-      hasCreate={isAdmin}
-      actions={<RadioListActions isAdmin={isAdmin} />}
-      filters={<RadioFilter />}
-      perPage={isXsmall ? 25 : 10}
-    >
+    <>
       <RadioDirectory />
-      {isXsmall ? (
-        <SimpleList
-          leftAvatar={(r) => <CoverArtField record={r} />}
-          leftIcon={(r) => (
-            <StreamField
-              record={r}
-              source={'streamUrl'}
-              hideUrl
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-              }}
-            />
-          )}
-          primaryText={(r) => r.name}
-          secondaryText={(r) => r.homePageUrl}
-        />
-      ) : (
-        <Datagrid rowClick={handleRowClick} classes={{ row: classes.row }}>
-          {columns}
-          {isAdmin && <EditButton />}
-        </Datagrid>
-      )}
-    </List>
+      <List
+        {...props}
+        exporter={false}
+        sort={{ field: 'name', order: 'ASC' }}
+        bulkActionButtons={isAdmin ? undefined : false}
+        hasCreate={isAdmin}
+        actions={<RadioListActions isAdmin={isAdmin} />}
+        filters={<RadioFilter />}
+        perPage={isXsmall ? 25 : 10}
+      >
+        {isXsmall ? (
+          <SimpleList
+            leftAvatar={(r) => <CoverArtField record={r} />}
+            leftIcon={(r) => (
+              <StreamField
+                record={r}
+                source={'streamUrl'}
+                hideUrl
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+              />
+            )}
+            primaryText={(r) => r.name}
+            secondaryText={(r) => r.homePageUrl}
+          />
+        ) : (
+          <Datagrid rowClick={handleRowClick} classes={{ row: classes.row }}>
+            {columns}
+            {isAdmin && <EditButton />}
+          </Datagrid>
+        )}
+      </List>
+    </>
   )
 }
 

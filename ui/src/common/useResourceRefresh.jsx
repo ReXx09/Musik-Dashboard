@@ -89,7 +89,11 @@ export const useResourceRefresh = (...visibleResources) => {
     Object.keys(resources).forEach((r) => {
       if (visibleResources.length === 0 || visibleResources?.includes(r)) {
         if (resources[r]?.length > 0) {
-          dataProvider.getMany(r, { ids: resources[r] })
+          if (r === 'album') {
+            refresh()
+          } else {
+            dataProvider.getMany(r, { ids: resources[r] })
+          }
         }
       }
     })

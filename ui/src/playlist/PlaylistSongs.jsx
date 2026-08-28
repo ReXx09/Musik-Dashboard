@@ -12,8 +12,9 @@ import {
 } from 'react-admin'
 import clsx from 'clsx'
 import { useDispatch } from 'react-redux'
-import { Card, useMediaQuery } from '@material-ui/core'
+import { Button, Card, Typography, useMediaQuery } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import ReactDragListView from 'react-drag-listview'
 import {
   DurationField,
@@ -79,6 +80,23 @@ const useStyles = makeStyles(
     ratingField: {
       visibility: 'hidden',
     },
+    albumSummary: {
+      display: 'flex',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: theme.spacing(1),
+      padding: theme.spacing(1, 2),
+      borderBottom: `1px solid ${theme.palette.divider}`,
+    },
+    albumSummaryTitle: {
+      marginRight: theme.spacing(1),
+      fontWeight: 600,
+    },
+    albumChip: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: theme.spacing(0.5),
+    },
   }),
   { name: 'RaList' },
 )
@@ -88,6 +106,62 @@ const ReorderableList = ({ readOnly, children, ...rest }) => {
     return children
   }
   return <ReactDragListView {...rest}>{children}</ReactDragListView>
+}
+
+const PlaylistAlbumSummary = ({ data, playlistId, readOnly, onRemoved }) => {
+  const classes = useStyles()
+  const dataProvider = useDataProvider()
+  const notify = useNotify()
+  const albums = Object.values(
+    data.reduce((groups, track) => {
+      const albumKey = track.albumId || track.album || 'unknown'
+      if (!groups[albumKey]) {
+        groups[albumKey] = { id: track.albumId, name: track.album, count: 0 }
+      }
+      groups[albumKey].count += 1
+      return groups
+    }, {}),
+  )
+
+  const removeAlbum = async (album) => {
+    try {
+      const result = await dataProvider.getList('playlistTrack', {
+        pagination: { page: 1, perPage: -1 },
+        sort: { field: 'id', order: 'ASC' },
+        filter: { playlist_id: playlistId },
+      })
+      const ids = result.data
+        .filter((track) =>
+          album.id ? track.albumId === album.id : track.album === album.name,
+        )
+        .map((track) => track.id)
+      if (!ids.length) return
+      await dataProvider.deleteMany(`playlist/${playlistId}/tracks`, { ids })
+      notify(`Album entfernt: ${album.name}`, 'info')
+      onRemoved()
+    } catch {
+      notify('Album konnte nicht aus der Wiedergabeliste entfernt werden.', 'warning')
+    }
+  }
+
+  if (readOnly || !albums.length) return null
+
+  return (
+    <div className={classes.albumSummary}>
+      <Typography className={classes.albumSummaryTitle}>Alben</Typography>
+      {albums.map((album) => (
+        <Button
+          key={album.id || album.name}
+          className={classes.albumChip}
+          size="small"
+          onClick={() => removeAlbum(album)}
+          startIcon={<DeleteOutlineIcon />}
+        >
+          {album.name || 'Unbekannt'} ({album.count})
+        </Button>
+      ))}
+    </div>
+  )
 }
 
 const PlaylistSongs = ({ playlistId, readOnly, actions, ...props }) => {
@@ -202,6 +276,12 @@ const PlaylistSongs = ({ playlistId, readOnly, actions, ...props }) => {
         classes={{ toolbar: classes.toolbar }}
         filters={props.filters}
         actions={actions}
+      />
+      <PlaylistAlbumSummary
+        data={Object.values(data)}
+        playlistId={playlistId}
+        readOnly={readOnly}
+        onRemoved={refetch}
       />
       <div className={classes.main}>
         <Card

@@ -95,7 +95,7 @@ describe('useResourceRefresh', () => {
       expect(getMany).not.toHaveBeenCalled()
     })
 
-    it('triggers a refetch of the resources received', () => {
+    it('refreshes the current view when albums change', () => {
       const useSelectorMock = () => ({
         lastReceived: lastTime,
         resources: { album: ['al-1', 'al-2'], song: ['sg-1', 'sg-2'] },
@@ -104,9 +104,8 @@ describe('useResourceRefresh', () => {
 
       useResourceRefresh()
 
-      expect(refresh).not.toHaveBeenCalled()
-      expect(getMany).toHaveBeenCalledTimes(2)
-      expect(getMany).toHaveBeenCalledWith('album', { ids: ['al-1', 'al-2'] })
+      expect(refresh).toHaveBeenCalledTimes(1)
+      expect(getMany).toHaveBeenCalledTimes(1)
       expect(getMany).toHaveBeenCalledWith('song', { ids: ['sg-1', 'sg-2'] })
     })
   })

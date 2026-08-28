@@ -16,10 +16,12 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import StarBorderIcon from '@material-ui/icons/StarBorder'
 import StarIcon from '@material-ui/icons/Star'
 import SearchIcon from '@material-ui/icons/Search'
+import { useNotify } from 'react-admin'
 import { useDispatch } from 'react-redux'
 import { setTrack } from '../actions'
 import { songFromRadio } from './helper'
-import { RADIO_PLACEHOLDER_IMAGE } from '../consts'
+import { RADIO_PLACEHOLDER_IMAGE, REST_URL } from '../consts'
+import { httpClient } from '../dataProvider'
 
 const API_URL = 'https://de1.api.radio-browser.info/json/stations/search'
 const FAVORITES_KEY = 'navidrome-radio-favorites'
@@ -81,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
 const RadioDirectory = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const notify = useNotify()
   const [query, setQuery] = useState('')
   const [country, setCountry] = useState('DE')
   const [stations, setStations] = useState([])
@@ -94,6 +97,36 @@ const RadioDirectory = () => {
   const [showFavorites, setShowFavorites] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+
+  const getServerRadios = async () => {
+    const response = await httpClient(`${REST_URL}/radio`)
+    return response.json?.data || []
+  }
+
+  const syncFavorite = async (station, isFavorite) => {
+    const streamUrl = station.url_resolved || station.url
+    const serverRadios = await getServerRadios()
+    const existingRadio = serverRadios.find((radio) => radio.streamUrl === streamUrl)
+
+    if (isFavorite) {
+      if (existingRadio) {
+        await httpClient(`${REST_URL}/radio/${existingRadio.id}`, { method: 'DELETE' })
+      }
+      return
+    }
+
+    if (!existingRadio) {
+      await httpClient(`${REST_URL}/radio`, {
+        method: 'POST',
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+          name: station.name,
+          streamUrl,
+          homePageUrl: station.homepage || '',
+        }),
+      })
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -133,15 +166,20 @@ const RadioDirectory = () => {
     dispatch(setTrack(await songFromRadio(radio)))
   }
 
-  const toggleFavorite = (station) => {
+  const toggleFavorite = async (station) => {
     const isFavorite = favorites.some(
       (favorite) => favorite.stationuuid === station.stationuuid,
     )
-    const nextFavorites = isFavorite
-      ? favorites.filter((favorite) => favorite.stationuuid !== station.stationuuid)
-      : [...favorites, station]
-    setFavorites(nextFavorites)
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(nextFavorites))
+    try {
+      await syncFavorite(station, isFavorite)
+      const nextFavorites = isFavorite
+        ? favorites.filter((favorite) => favorite.stationuuid !== station.stationuuid)
+        : [...favorites, station]
+      setFavorites(nextFavorites)
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(nextFavorites))
+    } catch {
+      notify('Radio konnte nicht gespeichert werden. Bitte Admin-Rechte prüfen.', 'warning')
+    }
   }
 
   const visibleStations = showFavorites ? favorites : stations

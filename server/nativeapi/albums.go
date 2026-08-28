@@ -45,7 +45,7 @@ func (api *Router) uploadAlbumImage() http.HandlerFunc {
 		}
 		album.UploadedImage = filename
 		album.UpdatedAt = time.Now()
-		return api.ds.Album(ctx).Put(album, "uploaded_image", "updated_at")
+		return api.ds.Album(ctx).Put(album)
 	})
 }
 
@@ -64,6 +64,6 @@ func (api *Router) deleteAlbumImage() http.HandlerFunc {
 		}
 		album.UploadedImage = ""
 		album.UpdatedAt = time.Now()
-		return api.ds.Album(ctx).Put(album, "uploaded_image", "updated_at")
+		return api.ds.Album(ctx).Put(album)
 	})
 }
